@@ -9,6 +9,19 @@
     "build": "tsc",
     "test": "echo \"Error: no test specified\" && exit 1"
   },
+  "husky": {
+    "hooks": {
+      "pre-commit": "lint-staged"
+    }
+  },
+  "lint-staged": {
+    "./**/*.{js,jsx,ts,tsx,json,css,scss,md}": [
+      "prettier --write",
+      "yarn lint",
+      "git add"
+    ]
+  },
+  "lint": "eslint './**/*.{ts,tsx}' --max-warnings 0",
   "repository": {
     "type": "git",
     "url": "git+https://github.com/PixelPioneersDAO/Employee-Health-Dashboard-Backend.git"
@@ -34,6 +47,8 @@
   },
   "devDependencies": {
     "@types/dotenv": "^8.2.0",
+    "husky": "^8.0.3",
+    "lint-staged": "^14.0.1",
     "nodemon": "^3.0.1",
     "ts-node": "^10.9.1"
   }

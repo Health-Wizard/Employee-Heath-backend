@@ -1,10 +1,14 @@
 import express, { Application, Request, Response } from 'express';
+import connectDB from './mongodb/dbConnect';
+import dotenv from 'dotenv';
+import userAuth from './routes/userAuth';
+dotenv.config();
 
 // Create an Express application
 const app: Application = express();
 
 // Define the port for the server
-const port: number = 3000;
+const port: unknown = process.env.PORT || 3000;
 
 // Middleware to parse JSON in request bodies
 app.use(express.json());
@@ -14,7 +18,20 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Hello, TypeScript and Express from app!');
 });
 
+app.use('/api/v1/user-auth', userAuth);
+
 // Start the server
-app.listen(port, () => {
-  console.log(`Server is running on port ${port}`);
-});
+const start = async () => {
+  try {
+    await connectDB(process.env.MONGO_URI!);
+    console.log(`Connected to MongoDB`);
+    app.listen(port, () => {
+      console.log(`Server is listening on port ${port}...`);
+      console.log(process.env.MONGO_URI)
+    });
+  } catch (err) {
+    console.error(err);
+  }
+};
+
+start();

@@ -8,14 +8,14 @@ dotenv.config();
 const app: Application = express();
 
 // Define the port for the server
-const port: unknown = process.env.PORT || 3000;
+const port: unknown = process.env.PORT || 8080;
 
 // Middleware to parse JSON in request bodies
 app.use(express.json());
 
 // Define a sample route
 app.get('/', (req: Request, res: Response) => {
-  res.send('Hello, TypeScript and Express from app!');
+  res.send('Hello, TypeScript and Express from app!!');
 });
 
 app.use('/api/v1/user-auth', userAuth);

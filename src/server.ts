@@ -18,7 +18,7 @@ app.get('/', (req: Request, res: Response) => {
   res.send('Hello, TypeScript and Express from app!!');
 });
 
-app.use('/api/v1/user-auth', userAuth);
+app.use('/api/v1/emp', userAuth);
 
 // Start the server
 const start = async () => {

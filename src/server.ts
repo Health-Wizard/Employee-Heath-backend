@@ -1,5 +1,4 @@
 import express, { Application, Request, Response } from 'express';
-import connectDB from './mongodb/dbConnect';
 import dotenv from 'dotenv';
 import userAuth from './routes/userAuth';
 dotenv.config();
@@ -23,7 +22,6 @@ app.use('/api/v1/emp', userAuth);
 // Start the server
 const start = async () => {
   try {
-    await connectDB(process.env.MONGO_URI!);
     console.log(`Connected to MongoDB`);
     app.listen(port, () => {
       console.log(`Server is listening on port ${port}...`);

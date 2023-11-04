@@ -1,11 +1,14 @@
-import User from '../models/User-Auth';
 import jwt from 'jsonwebtoken';
 import { Request, Response } from 'express';
+import { PrismaClient } from '@prisma/client';
+import bcrypt from 'bcrypt';
+import dotenv from 'dotenv';
+dotenv.config();
 
-const secretKey: string =
-  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiIxMjM0NTY3ODkwIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.SflKxwRJSMeKKF2QT4fwpMeJf36POk6yJV_adQssw5c';
 
 class UserAuthController {
+  prisma = new PrismaClient();
+
   /**
    * This function is to register the admin with the endpoint register/admin
    * @param req
@@ -13,27 +16,38 @@ class UserAuthController {
    * @returns
    */
   registerAdmin = async (req: Request, res: Response) => {
-    const { username, companyEmail, password } = req.body;
+    const { name, username, companyEmail, password } = req.body;
     const role = 'admin';
-    if (!username || !companyEmail || !password) {
+    if (!name || !username || !companyEmail || !password) {
       console.log(username, companyEmail, password);
       return res.status(400).json({
-        message: 'Username, password and company email are required.',
+        message: 'Username, password, name and company email are required.',
       });
     }
 
     try {
       // Check if the user already exists
-      const existingUser = await User.findOne({ username });
+      const existingUser = await this.prisma.register.findUnique({
+        where: { username }
+      });
       if (existingUser) {
         return res.status(409).json({ message: 'Username already exists.' });
       }
 
-      // Create a new user and save it to the database
-      const newUser = new User({ username, companyEmail, password, role });
-      await newUser.save();
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-      res.status(201).json({ message: 'User registered successfully.' });
+      // Create a new user and save it to the database
+      const newUser = await this.prisma.register.create({
+      data: {
+        name,
+        username,
+        companyEmail,
+        password: hashedPassword,
+        role,
+      },
+    });
+
+      res.status(201).json({ message: 'User registered successfully.', data: newUser });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Internal Server Error' });
@@ -47,27 +61,38 @@ class UserAuthController {
    * @returns
    */
   registerEmployee = async (req: Request, res: Response) => {
-    const { username, companyEmail, password } = req.body;
+    const { name, username, companyEmail, password } = req.body;
     const role = 'employee';
-    if (!username || !companyEmail || !password) {
+    if (!name || !username || !companyEmail || !password) {
       console.log(username, companyEmail, password);
       return res.status(400).json({
-        message: 'Username, password and company email are required.',
+        message: 'Username, password, name and company email are required.',
       });
     }
 
     try {
       // Check if the user already exists
-      const existingUser = await User.findOne({ username });
+      const existingUser = await this.prisma.register.findUnique({
+        where: { username }
+      });
       if (existingUser) {
         return res.status(409).json({ message: 'Username already exists.' });
       }
 
-      // Create a new user and save it to the database
-      const newUser = new User({ username, companyEmail, password, role });
-      await newUser.save();
+      const hashedPassword = await bcrypt.hash(password, 10);
 
-      res.status(201).json({ message: 'User registered successfully.' });
+      // Create a new user and save it to the database
+      const newUser = await this.prisma.register.create({
+      data: {
+        name,
+        username,
+        companyEmail,
+        password: hashedPassword,
+        role,
+      },
+    });
+
+      res.status(201).json({ message: 'User registered successfully.', data: newUser });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Internal Server Error' });
@@ -98,16 +123,29 @@ class UserAuthController {
 
     try {
       // Find the user by username and password
-      const user = await User.findOne({ username, password });
+      const user = await this.prisma.register.findUnique({
+        where: {
+          username
+        }
+      });
+
       if (!user) {
-        return res.status(401).json({ message: 'Invalid credentials.' });
+        return res.status(401).json({ message: 'Invalid username or password' });
       }
 
-      // Generate and return a JWT token
-      const token = jwt.sign({ username }, secretKey, { expiresIn: '1h' });
-      const role = user.role;
-      const empId = user._id;
-      res.json({ token, empId, username, role });
+      const passwordMatch = await bcrypt.compare(password, user.password);
+
+      if(passwordMatch) {
+        const token = jwt.sign( {
+          empId: user.id,
+          username: user.username,
+          role: user.role
+        }, process.env.JWT_TOKEN_KEY as string, {expiresIn: '1h'})
+
+        res.status(200).json({ message: "Successfully Authorized", token});
+      } else {
+        res.status(401).json({ message: 'Invalid username or password'});
+      }
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Internal Server Error' });
@@ -132,7 +170,11 @@ class UserAuthController {
     }
 
     try {
-      const employee = await User.findById(empId);
+      const employee = await this.prisma.register.findUnique({
+        where: {
+          id: parseInt(empId),
+        },
+      })
 
       if (!employee) {
         return res.status(404).json({ message: 'Employee not found' });

@@ -1,6 +1,7 @@
 import express from 'express';
 import UserAuthController from '../controllers/userAuthController'
 import EmployeeDetails from '../controllers/employeeDetails';
+import { authenticateJwt } from '../middlewares/userAuthMiddleWares';
 const router = express.Router();
 
 const userAuthController = new UserAuthController();
@@ -14,7 +15,7 @@ router.route('/login').post(userAuthController.loginEmployee);
 router.route('/register/admin').post(userAuthController.registerAdmin);
 
 // Get Role
-router.route('/role/:id').get(userAuthController.getRole)
+router.route('/role/:id').get(authenticateJwt, userAuthController.getRole)
 
 // Employee Form route
 router.route('/createEmployee').post(employeeDetails.createEmployeeDetails);

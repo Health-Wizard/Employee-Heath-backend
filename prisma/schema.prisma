@@ -11,10 +11,25 @@ datasource db {
 }
 
 model Register {
-  id           Int    @id @default(autoincrement())
+  id           Int       @id @default(autoincrement())
   name         String
-  username     String @unique
+  username     String    @unique
   password     String
   companyEmail String
   role         String
+  employee     Employee?
+}
+
+model Employee {
+  id            Int       @id @default(autoincrement())
+  empId         Int       @unique
+  register      Register? @relation(fields: [empId], references: [id])
+  username      String
+  name          String
+  companyEmail  String
+  designation   String
+  dateOfJoining DateTime
+  salary        String
+  role          String
+  gender        String
 }

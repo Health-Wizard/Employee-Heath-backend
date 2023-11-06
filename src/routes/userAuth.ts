@@ -1,5 +1,5 @@
 import express from 'express';
-import UserAuthController from '../controllers/userAuthController'
+import UserAuthController from '../controllers/userAuthController';
 import EmployeeDetails from '../controllers/employeeDetails';
 import { authenticateJwt } from '../middlewares/userAuthMiddleWares';
 const router = express.Router();
@@ -15,13 +15,23 @@ router.route('/login').post(userAuthController.loginEmployee);
 router.route('/register/admin').post(userAuthController.registerAdmin);
 
 // Get Role
-router.route('/role/:id').get(authenticateJwt, userAuthController.getRole)
+router.route('/role/:id').get(authenticateJwt, userAuthController.getRole);
 
 // Employee Form route
-router.route('/createEmployee').post(employeeDetails.createEmployeeDetails);
-router.route('/getEmployees').get(employeeDetails.getEmployeeDetails);
-router.route('/getEmployee/:id').get(employeeDetails.getSingleEmployee);
-router.route('/deleteEmployee/:id').delete(employeeDetails.deleteSingleEmployee);
-router.route('/updateEmployee/:id').post(employeeDetails.updateSingleEmployee);
+router
+  .route('/createEmployee')
+  .post(authenticateJwt, employeeDetails.createEmployeeDetails);
+router
+  .route('/getEmployees')
+  .get(authenticateJwt, employeeDetails.getEmployeeDetails);
+router
+  .route('/getEmployee/:id')
+  .get(authenticateJwt, employeeDetails.getSingleEmployee);
+router
+  .route('/deleteEmployee/:id')
+  .delete(authenticateJwt, employeeDetails.deleteSingleEmployee);
+router
+  .route('/updateEmployee/:id')
+  .post(authenticateJwt, employeeDetails.updateSingleEmployee);
 
 export default router;

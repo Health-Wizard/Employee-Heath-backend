@@ -33,3 +33,13 @@ model Employee {
   role          String
   gender        String
 }
+
+model Channels {
+  id               Int      @id @default(autoincrement())
+  url              String   @unique
+  name             String   @unique
+  create_timestamp DateTime
+  type             String
+  member_count     Int
+  last_message_id  Int
+}

@@ -24,6 +24,7 @@ class EmployeeDetails {
       salary,
       role,
       gender,
+      age,
       dateOfJoining,
       name,
     } = req.body;
@@ -60,7 +61,7 @@ class EmployeeDetails {
           message: 'Employee username does not match with login username',
         });
       }
-
+      const dateObject = new Date(dateOfJoining);
       // Create a new employee and save it to the database
       const newEmployee = await this.prisma.employee.create({
         data: {
@@ -69,10 +70,11 @@ class EmployeeDetails {
           name,
           companyEmail,
           designation,
-          dateOfJoining,
+          dateOfJoining:dateObject.toISOString(),
           salary,
           role,
           gender,
+          age,
         },
       });
 

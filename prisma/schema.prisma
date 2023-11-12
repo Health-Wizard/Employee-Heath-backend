@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -21,9 +18,8 @@ model Register {
 }
 
 model Employee {
-  id            Int       @id @default(autoincrement())
-  empId         Int       @unique
-  register      Register? @relation(fields: [empId], references: [id])
+  id            Int      @id @default(autoincrement())
+  empId         Int      @unique
   username      String
   name          String
   companyEmail  String
@@ -32,6 +28,8 @@ model Employee {
   salary        String
   role          String
   gender        String
+  age           Int
+  register      Register @relation(fields: [empId], references: [id])
 }
 
 model Channels {

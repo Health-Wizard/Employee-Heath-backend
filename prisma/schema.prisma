@@ -14,6 +14,7 @@ model Register {
   password     String
   companyEmail String
   role         String
+  companyName  String    @default("Company")
   employee     Employee?
 }
 
@@ -29,7 +30,9 @@ model Employee {
   role          String
   gender        String
   age           Int
+  department    String   @default("IT")
   register      Register @relation(fields: [empId], references: [id])
+  answer        Answer[]
 }
 
 model Channels {
@@ -40,4 +43,18 @@ model Channels {
   type             String
   member_count     Int
   last_message_id  Int
+}
+
+model Question {
+  id       Int      @id @default(autoincrement())
+  question String
+  answer   Answer[]
+}
+
+model Answer {
+  id       Int      @id @default(autoincrement())
+  qId      Int
+  empId    Int
+  question Question @relation(fields: [qId], references: [id])
+  employee Employee @relation(fields: [empId], references: [id])
 }

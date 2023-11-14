@@ -5,7 +5,6 @@ import bcrypt from 'bcrypt';
 import dotenv from 'dotenv';
 dotenv.config();
 
-
 class UserAuthController {
   prisma = new PrismaClient();
 
@@ -16,19 +15,19 @@ class UserAuthController {
    * @returns
    */
   registerAdmin = async (req: Request, res: Response) => {
-    const { name, username, companyEmail, password } = req.body;
+    const { name, username, companyEmail, password, companyName } = req.body;
     const role = 'admin';
-    if (!name || !username || !companyEmail || !password) {
-      console.log(username, companyEmail, password);
+    if (!name || !username || !companyEmail || !password || !companyName) {
       return res.status(400).json({
-        message: 'Username, password, name and company email are required.',
+        message:
+          'Username, password, name, company name and company email are required.',
       });
     }
 
     try {
       // Check if the user already exists
       const existingUser = await this.prisma.register.findUnique({
-        where: { username }
+        where: { username },
       });
       if (existingUser) {
         return res.status(409).json({ message: 'Username already exists.' });
@@ -38,16 +37,19 @@ class UserAuthController {
 
       // Create a new user and save it to the database
       const newUser = await this.prisma.register.create({
-      data: {
-        name,
-        username,
-        companyEmail,
-        password: hashedPassword,
-        role,
-      },
-    });
+        data: {
+          name,
+          username,
+          companyEmail,
+          password: hashedPassword,
+          companyName,
+          role,
+        },
+      });
 
-      res.status(201).json({ message: 'User registered successfully.', data: newUser });
+      res
+        .status(201)
+        .json({ message: 'User registered successfully.', data: newUser });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Internal Server Error' });
@@ -73,7 +75,7 @@ class UserAuthController {
     try {
       // Check if the user already exists
       const existingUser = await this.prisma.register.findUnique({
-        where: { username }
+        where: { username },
       });
       if (existingUser) {
         return res.status(409).json({ message: 'Username already exists.' });
@@ -83,16 +85,18 @@ class UserAuthController {
 
       // Create a new user and save it to the database
       const newUser = await this.prisma.register.create({
-      data: {
-        name,
-        username,
-        companyEmail,
-        password: hashedPassword,
-        role,
-      },
-    });
+        data: {
+          name,
+          username,
+          companyEmail,
+          password: hashedPassword,
+          role,
+        },
+      });
 
-      res.status(201).json({ message: 'User registered successfully.', data: newUser });
+      res
+        .status(201)
+        .json({ message: 'User registered successfully.', data: newUser });
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Internal Server Error' });
@@ -125,26 +129,41 @@ class UserAuthController {
       // Find the user by username and password
       const user = await this.prisma.register.findUnique({
         where: {
-          username
-        }
+          username,
+        },
       });
 
       if (!user) {
-        return res.status(401).json({ message: 'Invalid username or password' });
+        return res
+          .status(401)
+          .json({ message: 'Invalid username or password' });
       }
 
       const passwordMatch = await bcrypt.compare(password, user.password);
 
-      if(passwordMatch) {
-        const token = jwt.sign( {
-          empId: user.id,
-          username: user.username,
-          role: user.role
-        }, process.env.JWT_TOKEN_KEY as string, {expiresIn: '1h'})
+      if (passwordMatch) {
+        const token = jwt.sign(
+          {
+            empId: user.id,
+            username: user.username,
+            role: user.role,
+          },
+          process.env.JWT_TOKEN_KEY as string,
+          { expiresIn: '1h' }
+        );
 
-        res.status(200).json({ message: "Successfully Authorized", token, username: user.username, role: user.role, empId: user.id, companyEmail: user.companyEmail});
+        res
+          .status(200)
+          .json({
+            message: 'Successfully Authorized',
+            token,
+            username: user.username,
+            role: user.role,
+            empId: user.id,
+            companyEmail: user.companyEmail,
+          });
       } else {
-        res.status(401).json({ message: 'Invalid username or password'});
+        res.status(401).json({ message: 'Invalid username or password' });
       }
     } catch (error) {
       console.error(error);
@@ -174,7 +193,7 @@ class UserAuthController {
         where: {
           id: parseInt(empId),
         },
-      })
+      });
 
       if (!employee) {
         return res.status(404).json({ message: 'Employee not found' });
@@ -183,6 +202,23 @@ class UserAuthController {
       const roleType = employee.role;
       res.status(200).json({ roleType });
     } catch (error) {
+      return res.status(500).json({ message: 'Internal Server Error' });
+    }
+  };
+
+  getUniqueCompanyNames = async (req: Request, res: Response) => {
+    try {
+      const uniqueCompanyNames = await this.prisma.register.findMany({
+        select: {
+          companyName: true,
+        },
+        distinct: ['companyName'],
+      });
+
+      const companies = uniqueCompanyNames.map((result) => result.companyName);
+
+      res.status(200).json({ companies });
+    } catch (err) {
       return res.status(500).json({ message: 'Internal Server Error' });
     }
   };

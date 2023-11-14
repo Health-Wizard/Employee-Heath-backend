@@ -142,7 +142,7 @@ class UserAuthController {
           role: user.role
         }, process.env.JWT_TOKEN_KEY as string, {expiresIn: '1h'})
 
-        res.status(200).json({ message: "Successfully Authorized", token});
+        res.status(200).json({ message: "Successfully Authorized", token, username: user.username, role: user.role, empId: user.id, companyEmail: user.companyEmail});
       } else {
         res.status(401).json({ message: 'Invalid username or password'});
       }

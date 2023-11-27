@@ -45,6 +45,14 @@ model Channels {
   last_message_id  Int
 }
 
+enum AnswerValue {
+  strongly_agree    @map("5")
+  agree             @map("4")
+  neutral           @map("3")
+  disagree          @map("2")
+  strongly_disagree @map("1")
+}
+
 model Question {
   id       Int      @id @default(autoincrement())
   question String
@@ -52,9 +60,10 @@ model Question {
 }
 
 model Answer {
-  id       Int      @id @default(autoincrement())
+  id       Int         @id @default(autoincrement())
   qId      Int
   empId    Int
-  question Question @relation(fields: [qId], references: [id])
-  employee Employee @relation(fields: [empId], references: [id])
+  value    AnswerValue
+  question Question    @relation(fields: [qId], references: [id])
+  employee Employee    @relation(fields: [empId], references: [id])
 }

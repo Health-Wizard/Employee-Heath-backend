@@ -12,7 +12,7 @@ router.route('/register').post(userAuthController.registerEmployee);
 router.route('/login').post(userAuthController.loginEmployee);
 
 // Admin route
-router.route('/register/admin').post(userAuthController.registerAdmin);
+// router.route('/register/admin').post(userAuthController.registerAdmin);
 
 // Company Names
 router.route('/companyName').get(userAuthController.getUniqueCompanyNames);

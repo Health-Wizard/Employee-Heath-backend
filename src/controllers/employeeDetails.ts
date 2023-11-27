@@ -1,7 +1,6 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
-import { createSendbirdUser } from '../handlers/sendbird';
 dotenv.config();
 
 class EmployeeDetails {
@@ -77,8 +76,6 @@ class EmployeeDetails {
           age,
         },
       });
-
-      await createSendbirdUser(empId, username);
 
       res.status(201).json({
         message: 'Employee Details registered successfully.',

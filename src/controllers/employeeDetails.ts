@@ -1,6 +1,7 @@
 import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
+import { GetUserAuthInfoRequest } from '../interface/authInterface';
 dotenv.config();
 
 class EmployeeDetails {
@@ -14,11 +15,8 @@ class EmployeeDetails {
    * @param res
    * @returns
    */
-  createEmployeeDetails = async (req: Request, res: Response) => {
+  createEmployeeDetails = async (req: any, res: Response) => {
     const {
-      empId,
-      username,
-      companyEmail,
       designation,
       salary,
       role,
@@ -27,6 +25,10 @@ class EmployeeDetails {
       dateOfJoining,
       name,
     } = req.body;
+
+    const empId = req.user.empId;
+    const username = req.user.username;
+    const companyEmail = req.user.companyEmail;
 
     if (!username || !companyEmail || !role) {
       return res.status(400).json({
@@ -93,7 +95,7 @@ class EmployeeDetails {
    * @param req
    * @param res
    */
-  getEmployeeDetails = async (req: Request, res: Response) => {
+  getEmployeeDetails = async (req: any, res: Response) => {
     const page = parseInt(req.query.page as string) || 1;
     const limit = 20;
 
@@ -125,7 +127,7 @@ class EmployeeDetails {
    * @param res
    * @returns
    */
-  getSingleEmployee = async (req: Request, res: Response) => {
+  getSingleEmployee = async (req: any, res: Response) => {
     const empId = parseInt(req.params.id);
 
     if (!empId) {
@@ -155,7 +157,7 @@ class EmployeeDetails {
    * @param res
    * @returns
    */
-  updateSingleEmployee = async (req: Request, res: Response) => {
+  updateSingleEmployee = async (req: any, res: Response) => {
     const empId = parseInt(req.params.id);
 
     if (!empId) {
@@ -218,7 +220,7 @@ class EmployeeDetails {
    * @param res
    * @returns
    */
-  deleteSingleEmployee = async (req: Request, res: Response) => {
+  deleteSingleEmployee = async (req: any, res: Response) => {
     const empId = parseInt(req.params.id);
 
     if (!empId) {

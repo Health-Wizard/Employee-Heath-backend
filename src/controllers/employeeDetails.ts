@@ -16,12 +16,13 @@ class EmployeeDetails {
    * @returns
    */
   createEmployeeDetails = async (req: any, res: Response) => {
-    const { designation, salary, role, gender, age, dateOfJoining, name } =
+    const { designation, salary, role, gender, age, dateOfJoining, department, companyName } =
       req.body;
 
     const empId = req.user.empId;
     const username = req.user.username;
     const companyEmail = req.user.companyEmail;
+    const name = req.user.name;
 
     if (!username || !companyEmail || !role) {
       return res.status(400).json({
@@ -69,6 +70,8 @@ class EmployeeDetails {
           role,
           gender,
           age,
+          department,
+          companyName
         },
       });
 
@@ -249,6 +252,57 @@ class EmployeeDetails {
       res.status(500).json({ message: 'Internal Server Error' });
     }
   };
+
+//   getEmployeesByCompany = async (req: Request, res: Response) => {
+//   const empId = parseInt(req.params.empId); // Assuming empId is in the request parameters
+//   const page = parseInt(req.query.page as string) || 1;
+//   const limit = 20;
+
+//   try {
+//     // Check if the empId belongs to an admin
+//     const isAdmin = await checkIfAdmin(empId);
+
+//     if (isAdmin) {
+//       // If empId is an admin, get the company name of the admin
+//       const employee = await this.prisma.employee.findUnique({
+//         where: { empId },
+//         select: { companyName: true, role: true },
+//       });
+
+//       if (employee) {
+//         const { companyName, role } = employee;
+
+//         const skip = (page - 1) * limit;
+
+//         // Get all employees in the company, including admins and employees
+//         const employees = await this.prisma.employee.findMany({
+//           where: { companyName },
+//           skip,
+//           take: limit,
+//         });
+
+//         const totalEmployeeCount = await this.prisma.employee.count({
+//           where: { companyName },
+//         });
+
+//         res.status(200).json({
+//           currentPage: page,
+//           totalPages: Math.ceil(totalEmployeeCount / limit),
+//           employeeCount: totalEmployeeCount,
+//           employees,
+//         });
+//       } else {
+//         res.status(404).json({ message: 'Employee not found' });
+//       }
+//     } else {
+//       res.status(403).json({ message: 'Access denied. Only admins can retrieve employees by company.' });
+//     }
+//   } catch (error) {
+//     console.error(error);
+//     res.status(500).json({ message: 'Internal Server Error' });
+//   }
+// };
+
 
   getUniqueCompanyNames = async (req: Request, res: Response) => {
     try {

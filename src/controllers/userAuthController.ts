@@ -146,7 +146,8 @@ class UserAuthController {
           {
             empId: user.id,
             username: user.username,
-            companyEmail: user.companyEmail
+            companyEmail: user.companyEmail,
+            name: user.name,
           },
           process.env.JWT_TOKEN_KEY as string,
           { expiresIn: '1h' }

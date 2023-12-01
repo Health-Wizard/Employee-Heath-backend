@@ -22,8 +22,8 @@ export const authenticateJwt = (
       console.log(err);
       return res.status(403).json({ message: 'Invalid Token' });
     }
-    const { empId, username, companyEmail } = user;
-    req.user = { empId, username, companyEmail };
+    const { empId, username, companyEmail, name } = user;
+    req.user = { empId, username, companyEmail, name };
     next();
   });
 };

@@ -2,6 +2,7 @@ import { Request, Response } from 'express';
 import { PrismaClient } from '@prisma/client';
 import dotenv from 'dotenv';
 import { GetUserAuthInfoRequest } from '../interface/authInterface';
+import { checkIfAdmin } from '../handlers/employee';
 dotenv.config();
 
 class EmployeeDetails {
@@ -337,55 +338,84 @@ class EmployeeDetails {
     }
   };
 
-  //   getEmployeesByCompany = async (req: Request, res: Response) => {
-  //   const empId = parseInt(req.params.empId); // Assuming empId is in the request parameters
-  //   const page = parseInt(req.query.page as string) || 1;
-  //   const limit = 20;
+  getEmployeesByCompany = async (req: any, res: Response) => {
+    const empId = parseInt(req.user.empId);
+    const page = parseInt(req.query.page as string) || 1;
+    const limit = 20;
 
-  //   try {
-  //     // Check if the empId belongs to an admin
-  //     const isAdmin = await checkIfAdmin(empId);
+    try {
+      const isAdmin = await checkIfAdmin(empId);
 
-  //     if (isAdmin) {
-  //       // If empId is an admin, get the company name of the admin
-  //       const employee = await this.prisma.employee.findUnique({
-  //         where: { empId },
-  //         select: { companyName: true, role: true },
-  //       });
+      if (isAdmin) {
+        const employee = await this.prisma.employee.findUnique({
+          where: { empId },
+          select: { companyName: true, role: true },
+        });
 
-  //       if (employee) {
-  //         const { companyName, role } = employee;
+        if (employee) {
+          const { companyName } = employee;
 
-  //         const skip = (page - 1) * limit;
+          const skip = (page - 1) * limit;
 
-  //         // Get all employees in the company, including admins and employees
-  //         const employees = await this.prisma.employee.findMany({
-  //           where: { companyName },
-  //           skip,
-  //           take: limit,
-  //         });
+          const employees = await this.prisma.employee.findMany({
+            where: { companyName },
+            skip,
+            take: limit,
+          });
 
-  //         const totalEmployeeCount = await this.prisma.employee.count({
-  //           where: { companyName },
-  //         });
+          const totalEmployeeCount = await this.prisma.employee.count({
+            where: { companyName },
+          });
 
-  //         res.status(200).json({
-  //           currentPage: page,
-  //           totalPages: Math.ceil(totalEmployeeCount / limit),
-  //           employeeCount: totalEmployeeCount,
-  //           employees,
-  //         });
-  //       } else {
-  //         res.status(404).json({ message: 'Employee not found' });
-  //       }
-  //     } else {
-  //       res.status(403).json({ message: 'Access denied. Only admins can retrieve employees by company.' });
-  //     }
-  //   } catch (error) {
-  //     console.error(error);
-  //     res.status(500).json({ message: 'Internal Server Error' });
-  //   }
-  // };
+          res.status(200).json({
+            currentPage: page,
+            totalPages: Math.ceil(totalEmployeeCount / limit),
+            employeeCount: totalEmployeeCount,
+            employees,
+          });
+        } else {
+          res.status(404).json({ message: 'Employee not found' });
+        }
+      } else {
+        res
+          .status(403)
+          .json({
+            message:
+              'Access denied. Only admins can retrieve employees by company.',
+          });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  };
+
+  /**
+   * This function returns the role of a particular username
+   *
+   * @param req
+   * @param res
+   * @returns
+   */
+  getRole = async (req: any, res: Response) => {
+    try {
+      const empId = parseInt(req.user.empId);
+
+      const employee = await this.prisma.employee.findUnique({
+        where: { empId },
+        select: { role: true },
+      });
+
+      if (employee) {
+        res.status(200).json({ role: employee.role });
+      } else {
+        res.status(404).json({ message: 'Employee not found', role: "none" });
+      }
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  };
 
   getUniqueCompanyNames = async (req: Request, res: Response) => {
     try {

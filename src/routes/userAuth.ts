@@ -20,7 +20,7 @@ router
   .get(authenticateJwt, employeeDetails.getUniqueCompanyNames);
 
 // Get Role
-router.route('/role/:id').get(authenticateJwt, userAuthController.getRole);
+router.route('/role/').get(authenticateJwt, employeeDetails.getRole);
 
 // Employee Form route
 router
@@ -32,6 +32,9 @@ router
 router
   .route('/getEmployees')
   .get(authenticateJwt, employeeDetails.getEmployeeDetails);
+router
+  .route('/getEmployeesByCompany')
+  .get(authenticateJwt, employeeDetails.getEmployeesByCompany);
 router
   .route('/getEmployee/:id')
   .get(authenticateJwt, employeeDetails.getSingleEmployee);

@@ -32,6 +32,9 @@ model Employee {
   department    String?
   register      Register  @relation(fields: [empId], references: [id])
   answer        Answer[]
+  sector        String?
+  sizeOfCompany String?
+  companyUrl    String?
 }
 
 model Channels {

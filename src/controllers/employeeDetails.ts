@@ -7,6 +7,82 @@ dotenv.config();
 class EmployeeDetails {
   prisma = new PrismaClient();
 
+  createAdminDetails = async (req: any, res: Response) => {
+    const {
+      designation,
+      role,
+      gender,
+      companyName,
+      sector,
+      sizeOfCompany,
+      companyUrl,
+    } = req.body;
+
+    const empId = req.user.empId;
+    const username = req.user.username;
+    const companyEmail = req.user.companyEmail;
+    const name = req.user.name;
+
+    if (!username || !companyEmail || !role) {
+      return res.status(400).json({
+        message: 'Username, company email, and role are required.',
+      });
+    }
+
+    try {
+      // Check if the employee with empId already exists
+      const existingEmployee = await this.prisma.employee.findUnique({
+        where: { empId },
+      });
+
+      if (existingEmployee) {
+        return res.status(400).json({ message: 'Employee already exists.' });
+      }
+
+      // Check if the user with empId exists in the Register model
+      const existingUser = await this.prisma.register.findUnique({
+        where: { id: empId },
+      });
+
+      if (!existingUser) {
+        return res
+          .status(400)
+          .json({ message: 'Employee not in the login database.' });
+      }
+
+      if (existingUser.username !== username) {
+        return res.status(400).json({
+          message: 'Employee username does not match with login username',
+        });
+      }
+
+      // Create a new employee and save it to the database
+      const newEmployee = await this.prisma.employee.create({
+        data: {
+          empId,
+          username,
+          name,
+          companyEmail,
+          designation,
+          sector,
+          sizeOfCompany,
+          role,
+          gender,
+          companyUrl,
+          companyName,
+        },
+      });
+
+      res.status(201).json({
+        message: 'Employee Details registered successfully.',
+        data: newEmployee,
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'Internal Server Error' });
+    }
+  };
+
   /**
    * This function creates an employee in Employee database. This function also
    * create a emp id which is a primary key extracted from the id of the login
@@ -16,8 +92,16 @@ class EmployeeDetails {
    * @returns
    */
   createEmployeeDetails = async (req: any, res: Response) => {
-    const { designation, salary, role, gender, age, dateOfJoining, department, companyName } =
-      req.body;
+    const {
+      designation,
+      salary,
+      role,
+      gender,
+      age,
+      dateOfJoining,
+      department,
+      companyName,
+    } = req.body;
 
     const empId = req.user.empId;
     const username = req.user.username;
@@ -71,7 +155,7 @@ class EmployeeDetails {
           gender,
           age,
           department,
-          companyName
+          companyName,
         },
       });
 
@@ -253,56 +337,55 @@ class EmployeeDetails {
     }
   };
 
-//   getEmployeesByCompany = async (req: Request, res: Response) => {
-//   const empId = parseInt(req.params.empId); // Assuming empId is in the request parameters
-//   const page = parseInt(req.query.page as string) || 1;
-//   const limit = 20;
+  //   getEmployeesByCompany = async (req: Request, res: Response) => {
+  //   const empId = parseInt(req.params.empId); // Assuming empId is in the request parameters
+  //   const page = parseInt(req.query.page as string) || 1;
+  //   const limit = 20;
 
-//   try {
-//     // Check if the empId belongs to an admin
-//     const isAdmin = await checkIfAdmin(empId);
+  //   try {
+  //     // Check if the empId belongs to an admin
+  //     const isAdmin = await checkIfAdmin(empId);
 
-//     if (isAdmin) {
-//       // If empId is an admin, get the company name of the admin
-//       const employee = await this.prisma.employee.findUnique({
-//         where: { empId },
-//         select: { companyName: true, role: true },
-//       });
+  //     if (isAdmin) {
+  //       // If empId is an admin, get the company name of the admin
+  //       const employee = await this.prisma.employee.findUnique({
+  //         where: { empId },
+  //         select: { companyName: true, role: true },
+  //       });
 
-//       if (employee) {
-//         const { companyName, role } = employee;
+  //       if (employee) {
+  //         const { companyName, role } = employee;
 
-//         const skip = (page - 1) * limit;
+  //         const skip = (page - 1) * limit;
 
-//         // Get all employees in the company, including admins and employees
-//         const employees = await this.prisma.employee.findMany({
-//           where: { companyName },
-//           skip,
-//           take: limit,
-//         });
+  //         // Get all employees in the company, including admins and employees
+  //         const employees = await this.prisma.employee.findMany({
+  //           where: { companyName },
+  //           skip,
+  //           take: limit,
+  //         });
 
-//         const totalEmployeeCount = await this.prisma.employee.count({
-//           where: { companyName },
-//         });
+  //         const totalEmployeeCount = await this.prisma.employee.count({
+  //           where: { companyName },
+  //         });
 
-//         res.status(200).json({
-//           currentPage: page,
-//           totalPages: Math.ceil(totalEmployeeCount / limit),
-//           employeeCount: totalEmployeeCount,
-//           employees,
-//         });
-//       } else {
-//         res.status(404).json({ message: 'Employee not found' });
-//       }
-//     } else {
-//       res.status(403).json({ message: 'Access denied. Only admins can retrieve employees by company.' });
-//     }
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'Internal Server Error' });
-//   }
-// };
-
+  //         res.status(200).json({
+  //           currentPage: page,
+  //           totalPages: Math.ceil(totalEmployeeCount / limit),
+  //           employeeCount: totalEmployeeCount,
+  //           employees,
+  //         });
+  //       } else {
+  //         res.status(404).json({ message: 'Employee not found' });
+  //       }
+  //     } else {
+  //       res.status(403).json({ message: 'Access denied. Only admins can retrieve employees by company.' });
+  //     }
+  //   } catch (error) {
+  //     console.error(error);
+  //     res.status(500).json({ message: 'Internal Server Error' });
+  //   }
+  // };
 
   getUniqueCompanyNames = async (req: Request, res: Response) => {
     try {

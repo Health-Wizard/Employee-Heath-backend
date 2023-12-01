@@ -16,15 +16,8 @@ class EmployeeDetails {
    * @returns
    */
   createEmployeeDetails = async (req: any, res: Response) => {
-    const {
-      designation,
-      salary,
-      role,
-      gender,
-      age,
-      dateOfJoining,
-      name,
-    } = req.body;
+    const { designation, salary, role, gender, age, dateOfJoining, name } =
+      req.body;
 
     const empId = req.user.empId;
     const username = req.user.username;
@@ -71,7 +64,7 @@ class EmployeeDetails {
           name,
           companyEmail,
           designation,
-          dateOfJoining:dateObject.toISOString(),
+          dateOfJoining: dateObject.toISOString(),
           salary,
           role,
           gender,
@@ -254,6 +247,28 @@ class EmployeeDetails {
     } catch (error) {
       console.error(error);
       res.status(500).json({ message: 'Internal Server Error' });
+    }
+  };
+
+  getUniqueCompanyNames = async (req: Request, res: Response) => {
+    try {
+      const uniqueCompanyNames = await this.prisma.employee.findMany({
+        where: {
+          role: 'admin',
+        },
+        select: {
+          companyName: true,
+        },
+        distinct: ['companyName'],
+      });
+
+      const companies = uniqueCompanyNames
+        .filter((result) => result.companyName !== null)
+        .map((result) => result.companyName);
+
+      res.status(200).json({ companies });
+    } catch (err) {
+      return res.status(500).json({ message: 'Internal Server Error' });
     }
   };
 }

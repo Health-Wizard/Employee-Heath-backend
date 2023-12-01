@@ -65,6 +65,7 @@ class UserAuthController {
    */
   registerEmployee = async (req: Request, res: Response) => {
     const { name, username, companyEmail, password } = req.body;
+    console.log(name, username, companyEmail, password);
     if (!name || !username || !companyEmail || !password) {
       console.log(username, companyEmail, password);
       return res.status(400).json({
@@ -158,7 +159,7 @@ class UserAuthController {
           .json({
             message: 'Successfully Authorized',
             token,
-            role: access.role
+            isRegistered: access.isRegistered
           });
       } else {
         res.status(401).json({ message: 'Invalid username or password' });
@@ -204,23 +205,6 @@ class UserAuthController {
     // }
   };
 
-  getUniqueCompanyNames = async (req: Request, res: Response) => {
-  //   try {
-  //     const uniqueCompanyNames = await this.prisma.register.findMany({
-  //       select: {
-  //         companyName: true,
-  //       },
-  //       distinct: ['companyName'],
-  //     });
-
-  //     const companies = uniqueCompanyNames.map((result) => result.companyName);
-
-  //     res.status(200).json({ companies });
-  //   } catch (err) {
-  //     return res.status(500).json({ message: 'Internal Server Error' });
-  //   }
-  // };
-}
 }
 
 export default UserAuthController;

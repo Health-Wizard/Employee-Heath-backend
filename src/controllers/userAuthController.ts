@@ -171,41 +171,6 @@ class UserAuthController {
     }
   };
 
-  /**
-   * This function returns the role of a particular username
-   * {
-   *  "roleType": "employee/admin"
-   * }
-   *
-   * @param req
-   * @param res
-   * @returns
-   */
-  getRole = async (req: Request, res: Response) => {
-    // const empId = req.params.id;
-
-    // if (!empId) {
-    //   return res.status(400).json({ message: 'Employee Id is required' });
-    // }
-
-    // try {
-    //   const employee = await this.prisma.register.findUnique({
-    //     where: {
-    //       id: parseInt(empId),
-    //     },
-    //   });
-
-    //   if (!employee) {
-    //     return res.status(404).json({ message: 'Employee not found' });
-    //   }
-
-    //   const roleType = employee.role;
-    //   res.status(200).json({ roleType });
-    // } catch (error) {
-    //   return res.status(500).json({ message: 'Internal Server Error' });
-    // }
-  };
-
 }
 
 export default UserAuthController;

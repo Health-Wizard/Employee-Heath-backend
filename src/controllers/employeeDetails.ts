@@ -108,6 +108,7 @@ class EmployeeDetails {
     const username = req.user.username;
     const companyEmail = req.user.companyEmail;
     const name = req.user.name;
+    const ageAsInteger = parseInt(age, 10);
 
     if (!username || !companyEmail || !role) {
       return res.status(400).json({
@@ -154,7 +155,7 @@ class EmployeeDetails {
           salary,
           role,
           gender,
-          age,
+          age: ageAsInteger,
           department,
           companyName,
         },
@@ -357,6 +358,7 @@ class EmployeeDetails {
 
           const skip = (page - 1) * limit;
 
+          // Get all employees in the company, including admins and employees
           const employees = await this.prisma.employee.findMany({
             where: { companyName },
             skip,

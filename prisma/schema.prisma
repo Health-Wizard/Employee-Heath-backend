@@ -72,7 +72,7 @@ model Answer {
 model Health_Analytics {
   id          Int       @id @default(autoincrement())
   empId       Int       @unique
-  employee    Employee  @relation(fields: [empId], references: [id])
+  employee    Employee  @relation(fields: [empId], references: [empId])
   startDate   DateTime?
   endDate     DateTime?
   health_data Json?

@@ -39,12 +39,10 @@ model Employee {
 
 model Channels {
   id               Int      @id @default(autoincrement())
-  url              String   @unique
-  name             String   @unique
+  name             String?
   create_timestamp DateTime
-  type             String
-  member_count     Int
-  last_message_id  Int
+  channel_id       String   @unique
+  last_message_id  String?
 }
 
 enum AnswerValue {

@@ -23,6 +23,7 @@ class EmployeeDetails {
     const username = req.user.username;
     const companyEmail = req.user.companyEmail;
     const name = req.user.name;
+    const roleAsLowerCase = role.toLowerCase();
 
     if (!username || !companyEmail || !role) {
       return res.status(400).json({
@@ -67,7 +68,7 @@ class EmployeeDetails {
           designation,
           sector,
           sizeOfCompany,
-          role,
+          role: roleAsLowerCase,
           gender,
           companyUrl,
           companyName,
@@ -109,6 +110,7 @@ class EmployeeDetails {
     const companyEmail = req.user.companyEmail;
     const name = req.user.name;
     const ageAsInteger = parseInt(age, 10);
+    const roleAsLowerCase = role.toLowerCase();
 
     if (!username || !companyEmail || !role) {
       return res.status(400).json({
@@ -153,7 +155,7 @@ class EmployeeDetails {
           designation,
           dateOfJoining: dateObject.toISOString(),
           salary,
-          role,
+          role: roleAsLowerCase,
           gender,
           age: ageAsInteger,
           department,

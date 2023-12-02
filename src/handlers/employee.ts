@@ -11,7 +11,7 @@ export const checkIfAdmin = async (empId: number): Promise<boolean> => {
       select: { role: true },
     });
 
-    return employee?.role === 'Admin' || false;
+    return employee?.role === 'admin' || false;
   } catch (error) {
     console.error('Error in checkIfAdmin:', error);
     throw error;

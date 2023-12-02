@@ -179,7 +179,7 @@ class EmployeeDetails {
    */
   getEmployeeDetails = async (req: any, res: Response) => {
     const page = parseInt(req.query.page as string) || 1;
-    const limit = 20;
+    const limit = 9;
 
     try {
       const skip = (page - 1) * limit;
@@ -342,7 +342,7 @@ class EmployeeDetails {
   getEmployeesByCompany = async (req: any, res: Response) => {
     const empId = parseInt(req.user.empId);
     const page = parseInt(req.query.page as string) || 1;
-    const limit = 20;
+    const limit = 9;
 
     try {
       const isAdmin = await checkIfAdmin(empId);

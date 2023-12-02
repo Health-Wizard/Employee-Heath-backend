@@ -17,24 +17,25 @@ model Register {
 }
 
 model Employee {
-  id            Int       @id @default(autoincrement())
-  empId         Int       @unique
-  username      String    @unique
-  name          String
-  companyEmail  String    @unique
-  designation   String?
-  dateOfJoining DateTime?
-  salary        String?
-  role          String?
-  gender        String?
-  age           Int?
-  companyName   String?
-  department    String?
-  register      Register  @relation(fields: [empId], references: [id])
-  answer        Answer[]
-  sector        String?
-  sizeOfCompany String?
-  companyUrl    String?
+  id               Int               @id @default(autoincrement())
+  empId            Int               @unique
+  username         String            @unique
+  name             String
+  companyEmail     String            @unique
+  designation      String?
+  dateOfJoining    DateTime?
+  salary           String?
+  role             String?
+  gender           String?
+  age              Int?
+  companyName      String?
+  department       String?
+  register         Register          @relation(fields: [empId], references: [id])
+  answer           Answer[]
+  health_analytics Health_Analytics?
+  sector           String?
+  sizeOfCompany    String?
+  companyUrl       String?
 }
 
 model Channels {
@@ -66,4 +67,13 @@ model Answer {
   value    AnswerValue
   question Question    @relation(fields: [qId], references: [id])
   employee Employee    @relation(fields: [empId], references: [id])
+}
+
+model Health_Analytics {
+  id          Int       @id @default(autoincrement())
+  empId       Int       @unique
+  employee    Employee  @relation(fields: [empId], references: [id])
+  startDate   DateTime?
+  endDate     DateTime?
+  health_data Json?
 }

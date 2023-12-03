@@ -16,10 +16,9 @@ class CharView {
       });
 
       if (!healthDetails) {
-        return res.status(404).json({ message: "Employee not found." });
+        return res.status(404).json({ message: "No Data Found" });
       }
-      console.log(healthDetails);
-
+      // console.log(healthDetails);
       res.status(200).json(healthDetails.health_data);
     } catch (error) {
       console.error(error);
